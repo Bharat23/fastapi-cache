@@ -22,19 +22,19 @@ def test_datetime() -> None:
         response = client.get("/datetime")
         assert response.headers.get("X-FastAPI-Cache") == "MISS"
         now = response.json().get("now")
-        now_ = pendulum.now().replace(microsecond=0)  # type: ignore[no-untyped-call]
-        assert pendulum.parse(now).replace(microsecond=0) == now_  # type: ignore[attr-defined]
+        now_ = pendulum.now()
+        assert pendulum.parse(now) == now_
         response = client.get("/datetime")
         assert response.headers.get("X-FastAPI-Cache") == "HIT"
         now = response.json().get("now")
-        assert pendulum.parse(now).replace(microsecond=0) == now_  # type: ignore[attr-defined]
+        assert pendulum.parse(now) == now_
         time.sleep(3)
         response = client.get("/datetime")
         now = response.json().get("now")
         assert response.headers.get("X-FastAPI-Cache") == "MISS"
-        now = pendulum.parse(now).replace(microsecond=0)  # type: ignore[attr-defined]
+        now = pendulum.parse(now)
         assert now != now_
-        assert now == pendulum.now().replace(microsecond=0)  # type: ignore[no-untyped-call]
+        assert now == pendulum.now()
 
 
 def test_date() -> None:
@@ -42,19 +42,19 @@ def test_date() -> None:
     with TestClient(app) as client:
         response = client.get("/date")
         assert response.headers.get("X-FastAPI-Cache") == "MISS"
-        assert pendulum.parse(response.json()) == pendulum.today()  # type: ignore[attr-defined]
+        assert pendulum.parse(response.json()) == pendulum.today()
 
         # do it again to test cache
         response = client.get("/date")
         assert response.headers.get("X-FastAPI-Cache") == "HIT"
-        assert pendulum.parse(response.json()) == pendulum.today()  # type: ignore[attr-defined]
+        assert pendulum.parse(response.json()) == pendulum.today()
 
         # now test with cache disabled, as that's a separate code path
         FastAPICache._enable = False  # pyright: ignore[reportPrivateUsage]
         response = client.get("/date")
         assert "X-FastAPI-Cache" not in response.headers
-        assert pendulum.parse(response.json()) == pendulum.today()  # type: ignore[attr-defined]
-        FastAPICache._enable = True  # pyright: ignore[reportPrivateUsage]
+        assert pendulum.parse(response.json()) == pendulum.today()
+        FastAPICache._enable = True # pyright: ignore[reportPrivateUsage]
 
 
 def test_sync() -> None:
@@ -99,10 +99,10 @@ def test_pydantic_model() -> None:
 
 def test_non_get() -> None:
     with TestClient(app) as client:
-        response = client.put("/uncached_put")
+        response = client.put("/cached_put")
         assert "X-FastAPI-Cache" not in response.headers
         assert response.json() == {"value": 1}
-        response = client.put("/uncached_put")
+        response = client.put("/cached_put")
         assert "X-FastAPI-Cache" not in response.headers
         assert response.json() == {"value": 2}
 
@@ -112,6 +112,29 @@ def test_alternate_injected_namespace() -> None:
         response = client.get("/namespaced_injection")
         assert response.headers.get("X-FastAPI-Cache") == "MISS"
         assert response.json() == {"__fastapi_cache_request": 42, "__fastapi_cache_response": 17}
+
+def test_cache_control() -> None:
+    with TestClient(app) as client:
+        response = client.get("/cached_put")
+        assert response.json() == {"value": 1}
+
+        # HIT
+        response = client.get("/cached_put")
+        assert response.json() == {"value": 1}
+
+        # no-cache
+        response = client.get("/cached_put", headers={"Cache-Control": "no-cache"})
+        assert response.json() == {"value": 2}
+
+        response = client.get("/cached_put")
+        assert response.json() == {"value": 2}
+
+        # no-store
+        response = client.get("/cached_put", headers={"Cache-Control": "no-store"})
+        assert response.json() == {"value": 3}
+
+        response = client.get("/cached_put")
+        assert response.json() == {"value": 2}
 
 def test_cache_control_header() -> None:
     """Test no-cache, no-store cache control header"""

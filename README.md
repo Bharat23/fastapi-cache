@@ -64,7 +64,15 @@ from fastapi_cache.decorator import cache
 
 from redis import asyncio as aioredis
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    redis = aioredis.from_url("redis://localhost")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @cache()
@@ -76,12 +84,6 @@ async def get_cache():
 @cache(expire=60)
 async def index():
     return dict(hello="world")
-
-@asynccontextmanager
-async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    redis = aioredis.from_url("redis://localhost")
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-    yield
 ```
 
 ### Initialization
