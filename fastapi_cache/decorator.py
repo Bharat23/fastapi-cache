@@ -97,7 +97,7 @@ def _extract_cache_control_headers(request: Optional[Request]) -> Set[str]:
         headers = {header_key.lower(): header_val for header_key, header_val in request.headers.items()}
         cache_control_header = headers.get("cache-control", None)
         if cache_control_header:
-            return set([cache_control_val.strip().lower() for cache_control_val in cache_control_header.split(",")])
+            return {cache_control_val.strip().lower() for cache_control_val in cache_control_header.split(",")}
     return set()
 
 
