@@ -86,16 +86,14 @@ def _uncacheable(request: Optional[Request]) -> bool:
 
 def _extract_cache_control_headers(request: Optional[Request]) -> Set[str]:
     """Extracts Cache-Control header
-    1. Convert all header to lowercase to make it case insensitive
-    2. Split on comma (,)
-    3. Strip whitespaces
-    4. convert to all lower case
+    1. Split on comma (,)
+    2. Strip whitespaces
+    3. convert to all lower case
 
     returns an empty set if header not set
     """
     if request is not None:
-        headers = {header_key.lower(): header_val for header_key, header_val in request.headers.items()}
-        cache_control_header = headers.get("cache-control", None)
+        cache_control_header = request.headers.get("cache-control", None)
         if cache_control_header:
             return {cache_control_val.strip().lower() for cache_control_val in cache_control_header.split(",")}
     return set()
