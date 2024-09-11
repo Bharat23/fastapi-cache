@@ -7,11 +7,11 @@ from typing import (
     Callable,
     List,
     Optional,
+    Set,
     Type,
     TypeVar,
     Union,
     cast,
-    Set,
 )
 
 if sys.version_info >= (3, 10):

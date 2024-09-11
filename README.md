@@ -235,6 +235,28 @@ coverage html
 xdg-open htmlcov/index.html
 ```
 
+## Linting
+
+### Manually
+- Install the optional `linting` related dependency
+```shell
+poetry install --with linting
+```
+
+- Run the linting check
+```shell
+ruff check --show-source .
+```
+- With auto-fix
+```shell
+ruff check --show-source . --fix
+```
+
+### Using make command (one-liner)
+```shell
+make lint
+```
+
 ## License
 
 This project is licensed under the [Apache-2.0](https://github.com/long2ice/fastapi-cache/blob/master/LICENSE) License.
