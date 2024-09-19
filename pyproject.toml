@@ -18,12 +18,12 @@ include = ["LICENSE", "README.md"]
 python = "^3.8"
 fastapi = "*"
 uvicorn = "*"
-redis = { version = "^4.2.0rc1", optional = true }
 typing-extensions = { version = ">=4.1.0" }
 importlib-metadata = { version = "^6.6.0", python = "<3.8" }
 pendulum = "^3.0.0"
 aiomcache = { version = "^0.8.2", optional = true }
 aiobotocore = {version = "^2.13.1", optional = true}
+redis = {version = "^5.0.8", extras = ["redis"]}
 
 [tool.poetry.group.linting]
 optional = true
