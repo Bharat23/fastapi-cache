@@ -97,7 +97,7 @@ class Coder:
 
 class JsonCoder(Coder):
     @classmethod
-    def encode(cls, value: Any) -> bytes:
+    def encode(cls, value: Any) -> Any:
         if isinstance(value, JSONResponse):
             return value.body
         return json.dumps(value, cls=JsonEncoder).encode()
