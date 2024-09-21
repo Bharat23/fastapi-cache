@@ -1,4 +1,3 @@
-# mypy: disable-error-code="union-attr"
 import time
 from typing import Any, Generator
 
@@ -24,11 +23,11 @@ def test_datetime() -> None:
         assert response.headers.get("X-FastAPI-Cache") == "MISS"
         now = response.json().get("now")
         now_ = pendulum.now()
-        assert pendulum.parse(now).to_atom_string() == now_.to_atom_string()
+        assert pendulum.parse(now).to_atom_string() == now_.to_atom_string() # type: ignore[union-attr]
         response = client.get("/datetime")
         assert response.headers.get("X-FastAPI-Cache") == "HIT"
         now = response.json().get("now")
-        assert pendulum.parse(now).to_atom_string() == now_.to_atom_string()
+        assert pendulum.parse(now).to_atom_string() == now_.to_atom_string() # type: ignore[union-attr]
         time.sleep(3)
         response = client.get("/datetime")
         now = response.json().get("now")
