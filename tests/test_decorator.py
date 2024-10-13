@@ -34,7 +34,7 @@ def test_datetime() -> None:
         assert response.headers.get("X-FastAPI-Cache") == "MISS"
         now = pendulum.parse(now)
         assert now != now_
-        assert now.to_atom_string() == pendulum.now().to_atom_string()
+        assert now.to_atom_string() == pendulum.now().to_atom_string() # type: ignore[union-attr,unused-ignore]
 
 
 def test_date() -> None:
